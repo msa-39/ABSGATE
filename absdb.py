@@ -23,7 +23,13 @@ db_user, db_user_pwd, db_host, db_service_name = getdbsettings("absgate.ini")
 def set_connection():
     return  cx_Oracle.connect("{}/{}@{}/{}".format(db_user, db_user_pwd, db_host, db_service_name))
 
-con = set_connection()
+try:
+    con = set_connection()
+except:
+    print('[ERROR] DB Connection ERROR!')
+
+def execPLSQL(plsql)
+    con.execute(plsql)
 
 def close_con():
     con.close()

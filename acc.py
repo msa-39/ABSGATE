@@ -41,7 +41,7 @@ def RezervNewAcc():
 @app.route('/absapi/v1/acc', methods=['PUT'])
 # Chane Acount status from REZERV to OPEN
 def ChangeAccStatus():
-    return "3"
+    return make_response("[Ok] ChangeAccStatus\n", 200)
 
 
 
