@@ -7,6 +7,11 @@ import json
 app = Flask(__name__)
 
 @app.route('/absapi/v1/acc', methods=['GET'])
+# Get information about Account
+def GetAccInfo():
+    return make_response("[Ok] GetAccInfo\n", 200)
+
+@app.route('/absapi/v1/acc/balance', methods=['GET'])
 # Get information about Account balance
 def GetAccBalance():
     return make_response("[Ok] GetAccBalance\n", 200)

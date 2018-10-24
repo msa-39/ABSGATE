@@ -28,7 +28,7 @@ try:
 except:
     print('[ERROR] DB Connection ERROR!')
 
-def execPLSQL(plsql)
+def execPLSQL(plsql):
     con.execute(plsql)
 
 def close_con():
