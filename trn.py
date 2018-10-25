@@ -1,6 +1,7 @@
 # Микросервис API для работы с проводками
 
 from flask import Flask, jsonify, request, make_response
+from dbutills import absdb
 
 app = Flask(__name__)
 
