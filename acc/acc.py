@@ -1,7 +1,6 @@
 # Микросервис API для работы со счетами
 
-import absdb as db
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, request, make_response
 import json
 
 app = Flask(__name__)
@@ -51,7 +50,7 @@ def RezervNewAcc():
 @app.route('/absapi/v1/acc/<int:iacccur>/<int:iaccacc>', methods=['PUT'])
 # Chane Acount status from REZERV to OPEN
 def ChangeAccStatus(iacccur, iaccacc):
-    return make_response("[Ok] ChangeAccStatus\n Acc = "+str(iaccacc)", 200)
+    return make_response("[Ok] ChangeAccStatus\n Acc = "+str(iaccacc), 200)
 
 
 
