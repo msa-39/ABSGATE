@@ -2,6 +2,7 @@
 
 from flask import Flask, request, make_response
 import json
+from dbutills import absdb
 
 app = Flask(__name__)
 
@@ -51,7 +52,6 @@ def RezervNewAcc():
 # Chane Acount status from REZERV to OPEN
 def ChangeAccStatus(iacccur, iaccacc):
     return make_response("[Ok] ChangeAccStatus\n Acc = "+str(iaccacc), 200)
-
 
 
 if __name__ == '__main__':

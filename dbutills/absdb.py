@@ -6,17 +6,18 @@ os.environ["NLS_LANG"] = "AMERICAN_CIS.CL8ISO8859P5"
 
 def getdbsettings(ini_path):
     if not os.path.exists(ini_path):
-        print("No ini files found")
+        print("[ERROR] No ini files found")
+        exit()
     else:
         config = configparser.ConfigParser()
         config.read(ini_path)
     # Читаем значения из конфиг. файла.
-        db_user = config.get("ABS DB", "user")
-        db_user_pwd = config.get("ABS DB", "pwd")
-        db_host = config.get("ABS DB", "dbhost")
-        db_service_name = config.get("ABS DB", "service_name")
+        l_db_user = config.get("ABS DB", "user")
+        l_db_user_pwd = config.get("ABS DB", "pwd")
+        l_db_host = config.get("ABS DB", "dbhost")
+        l_db_service_name = config.get("ABS DB", "service_name")
 
-    return (db_user, db_user_pwd, db_host, db_service_name)
+    return (l_db_user, l_db_user_pwd, l_db_host, l_db_service_name)
 
 db_user, db_user_pwd, db_host, db_service_name = getdbsettings("absgate.ini")
 

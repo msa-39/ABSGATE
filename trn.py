@@ -5,7 +5,9 @@ from flask import Flask, jsonify, request, make_response
 app = Flask(__name__)
 
 @app.route('/absapi/v1/trn', methods=['POST'])
-
+# Register PayMent
+def RegPayment():
+    return make_response("[Ok] RegPayment\n", 200)
 
 
 if __name__ == '__main__':
