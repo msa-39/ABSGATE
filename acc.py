@@ -6,15 +6,20 @@ import json
 
 app = Flask(__name__)
 
-@app.route('/absapi/v1/acc', methods=['GET'])
+@app.route('/absapi/v1/acc/<int:iacccur>/<int:iaccacc>', methods=['GET'])
 # Get information about Account
-def GetAccInfo():
-    return make_response("[Ok] GetAccInfo\n", 200)
+def GetAccInfo(iacccur, iaccacc):
+    return make_response("[Ok] GetAccInfo\n Acc = "+str(iaccacc), 200)
 
-@app.route('/absapi/v1/acc/balance', methods=['GET'])
+@app.route('/absapi/v1/acc/<int:iacccur>/<int:iaccacc>/balance', methods=['GET'])
 # Get information about Account balance
-def GetAccBalance():
-    return make_response("[Ok] GetAccBalance\n", 200)
+def GetAccBalance(iacccur, iaccacc):
+    return make_response("[Ok] GetAccBalance\n Acc = "+str(iaccacc), 200)
+
+@app.route('/absapi/v1/acc/<int:iacccur>/<int:iaccacc>/gab', methods=['GET'])
+# Get GAB for Account
+def GetAccGab(iacccur, iaccacc):
+    return make_response("[Ok] GetAccGab\n Acc = "+str(iaccacc), 200)
 
 @app.route('/absapi/v1/acc', methods=['POST'])
 # Open new Acount in REZERV status
@@ -43,10 +48,10 @@ def RezervNewAcc():
                                       p_ext_cus_id,
                                       p_ext_cus_status), 400)
 
-@app.route('/absapi/v1/acc', methods=['PUT'])
+@app.route('/absapi/v1/acc/<int:iacccur>/<int:iaccacc>', methods=['PUT'])
 # Chane Acount status from REZERV to OPEN
-def ChangeAccStatus():
-    return make_response("[Ok] ChangeAccStatus\n", 200)
+def ChangeAccStatus(iacccur, iaccacc):
+    return make_response("[Ok] ChangeAccStatus\n Acc = "+str(iaccacc)", 200)
 
 
 
