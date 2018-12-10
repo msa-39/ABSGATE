@@ -1,3 +1,5 @@
+import json
+
 import cx_Oracle
 import configparser
 import os
@@ -20,6 +22,7 @@ def getdbsettings(ini_path):
     return (l_db_user, l_db_user_pwd, l_db_host, l_db_service_name)
 
 db_user, db_user_pwd, db_host, db_service_name = getdbsettings("absgate.ini")
+con = None
 
 def set_connection():
     return  cx_Oracle.connect("{}/{}@{}/{}".format(db_user, db_user_pwd, db_host, db_service_name))
@@ -28,6 +31,11 @@ try:
     con = set_connection()
 except:
     print('[ERROR] DB Connection ERROR!')
+
+cu = con.cursor()
+cu.execute('SELECT idsmr, csmrname FROM smr_mf')
+result=cu.fetchall()
+print(json.dumps(result, ensure_ascii=False))
 
 def execPLSQL(plsql):
     con.execute(plsql)
