@@ -32,13 +32,16 @@ try:
 except:
     print('[ERROR] DB Connection ERROR!')
 
-cu = con.cursor()
-cu.execute('SELECT idsmr, csmrname FROM smr_mf')
-result=cu.fetchall()
-print(json.dumps(result, ensure_ascii=False))
+#cu = con.cursor()
+#cu.execute('SELECT idsmr, csmrname FROM smr_mf')
+#result=cu.fetchall()
+#print(json.dumps(result, ensure_ascii=False))
 
 def execPLSQL(plsql):
-    con.execute(plsql)
+    cu = con.cursor()
+    cu.execute(plsql)
+    result=cu.fetchall()
+    return result
 
 def close_con():
     con.close()
