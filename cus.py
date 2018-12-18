@@ -1,10 +1,13 @@
 # Микросервис API для работы с клиентами
 
-from flask import Flask, jsonify, make_response
+from flask import Flask, jsonify, make_response, request
 from dbutills import absdb
 from flask_httpauth import HTTPTokenAuth
 from utills import clients
 import json
+import logging
+
+#logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s', level=logging.DEBUG, filename=u'abs_api_cus.log')
 
 app = Flask(__name__)
 
@@ -31,19 +34,55 @@ def not_found(error):
 #@auth.login_required
 # Get short information about ALL Custimers, hwo has opened account
 def GetCusAll():
-    plSQL = "select isb_cus_api.pljson_list2clob((pljson_dyn.executelist('select * from isb_real_cus_today'))) from dual"
-    res = absdb.execPLSQL(plSQL)
+    inn = request.args.get('inn')
+    inn = (inn or '')
+    con = None
+    try:
+        con = absdb.set_connection()
+    except:
+        print('[ERROR] DB Connection ERROR!')
+    cu = con.cursor()
+    plSQL = "select isb_abs_api_cus.get_all_cus_info(:inn) from dual"
+    cu.execute(plSQL, inn=inn)
+    res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>', methods=['GET'])
 #@auth.login_required
 # Get short information about Custimer by icusnum
 def GetCusInfo(icusnum):
-    plSQL = "select isb_cus_api.pljson_list2clob((pljson_dyn.executelist('select * from isb_real_cus_today where icusnum = " + str(icusnum) + "'))) from dual"
-    res = absdb.execPLSQL(plSQL)
+    res = None
+    con = None
+    try:
+        con = absdb.set_connection()
+    except:
+        print('[ERROR] DB Connection ERROR!')
+    cu = con.cursor()
+    plSQL = "select isb_abs_api_cus.get_cus_info(:icusnum) from dual"
+    cu.execute(plSQL, icusnum=icusnum)
+    res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
-#    return make_response(jsonify({'msg': '[Ok] GetCusInfo CusNum = '+str(icusnum)}), 200)
+@app.route('/absapi/v1/cus/<int:icusnum>/fullinfo', methods=['GET'])
+#@auth.login_required
+# Get FULL information about Custimer by icusnum
+def GetCusFullInfo(icusnum):
+    res = None
+    con = None
+    try:
+        con = absdb.set_connection()
+    except:
+        print('[ERROR] DB Connection ERROR!')
+    cu = con.cursor()
+    plSQL = "select isb_abs_api_cus.get_cus_full_info(:icusnum) from dual"
+    cu.execute(plSQL, icusnum=icusnum)
+    res=cu.fetchall()
+    return make_response(jsonify(json.loads(res[0][0].read())), 200)
+
+#    return make_response(jsonify({'msg': '[Ok] GetCusFullInfo CusNum = '+str(icusnum)}), 200)
+
+
+
 
 @app.route('/absapi/v1/cus/<int:icusnum>/docums', methods=['GET'])
 #@auth.login_required
@@ -74,6 +113,12 @@ def GetCusRuksInfo(icusnum):
 # Get short information about Custimer by icusnum
 def GetCusBankProductsInfo(icusnum):
     return make_response(jsonify({'msg': '[Ok] GetCusBankProductsInfo CusNum = '+str(icusnum)}), 200)
+
+@app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/credits', methods=['GET'])
+#@auth.login_required
+# Get short information about Custimer by icusnum
+def GetCusCreditsInfo(icusnum):
+    return make_response(jsonify({'msg': '[Ok] GetCusCreditsInfo CusNum = '+str(icusnum)}), 200)
 
 ########################################################################################################################
 

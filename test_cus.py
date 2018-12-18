@@ -6,7 +6,7 @@ API_KEY = 'eyJhbGciOiJIUzUxMiIsImlhdCI6MTU0NDA5ODM0MCwiZXhwIjoxNTc1NjM0MzQwfQ.ey
 BASE_URL = 'https://localhost:5002/absapi/v1/'
 
 def getffullcusinfo():
-    url = BASE_URL+'cus_full/'
+    url = BASE_URL+'cus/222512'
     headers = {"Authorization": "Bearer %s" % API_KEY,
                "Content-Type": "application/json",
                "Accept": "application/json",
