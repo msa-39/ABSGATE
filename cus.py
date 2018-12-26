@@ -42,7 +42,7 @@ def GetCusAll():
     except:
         print('[ERROR] DB Connection ERROR!')
     cu = con.cursor()
-    plSQL = "select isb_abs_api_cus.get_all_cus_info(:inn) from dual"
+    plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_all_cus_info(:inn)) from dual"
     cu.execute(plSQL, inn=inn)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
@@ -58,7 +58,7 @@ def GetCusInfo(icusnum):
     except:
         print('[ERROR] DB Connection ERROR!')
     cu = con.cursor()
-    plSQL = "select isb_abs_api_cus.get_cus_info(:icusnum) from dual"
+    plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
@@ -74,7 +74,7 @@ def GetCusFullInfo(icusnum):
     except:
         print('[ERROR] DB Connection ERROR!')
     cu = con.cursor()
-    plSQL = "select isb_abs_api_cus.get_cus_full_info(:icusnum) from dual"
+    plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_full_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
