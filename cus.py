@@ -7,7 +7,7 @@ from utills import clients
 import json
 import logging
 
-#logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s', level=logging.DEBUG, filename=u'abs_api_cus.log')
+logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s', level=logging.DEBUG, filename=u'abs_api_cus.log')
 
 app = Flask(__name__)
 
