@@ -1,15 +1,47 @@
 # Микросервис API для работы со счетами
 
-from flask import Flask, request, make_response
+from flask import Flask, jsonify, make_response, request
 import json
 from dbutills import absdb
+from flask_httpauth import HTTPTokenAuth
 
 app = Flask(__name__)
 
-@app.route('/absapi/v1/acc/<int:iacccur>/<int:iaccacc>', methods=['GET'])
+app.config['JSON_SORT_KEYS'] = False
+
+auth = HTTPTokenAuth('Bearer')
+
+@auth.error_handler
+def unauthorized():
+    return make_response(jsonify({'ERROR': 'Unauthorized access'}), 403)
+    # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
+
+@app.errorhandler(400)
+def bad_request(error):
+    return make_response(jsonify({'ERROR': 'Bad request'}), 400)
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(jsonify({'ERROR': 'Not found'}), 404)
+
+
+@app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>', methods=['GET'])
 # Get information about Account
-def GetAccInfo(iacccur, iaccacc):
-    return make_response("[Ok] GetAccInfo\n Acc = "+str(iaccacc), 200)
+def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
+    res = None
+    con = None
+    try:
+        con = absdb.set_connection()
+    except:
+        print('[ERROR] DB Connection ERROR!')
+    cu = con.cursor()
+    plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_acc.get_acc_info(:p_caccacc, :p_cacccur, :p_idsmr)) from dual"
+    cu.execute(plSQL, p_caccacc=str(p_iaccacc), p_cacccur=p_cacccur, p_idsmr=p_idsmr)
+    res=cu.fetchall()
+    return make_response(jsonify(json.loads(res[0][0].read())), 200)
+
+
+"""
 
 @app.route('/absapi/v1/acc/<int:iacccur>/<int:iaccacc>/balance', methods=['GET'])
 # Get information about Account balance
@@ -53,6 +85,7 @@ def RezervNewAcc():
 def ChangeAccStatus(iacccur, iaccacc):
     return make_response("[Ok] ChangeAccStatus\n Acc = "+str(iaccacc), 200)
 
+"""
 
 if __name__ == '__main__':
     app.run(ssl_context=('/home/moiseev/cert.pem', '/home/moiseev/key.pem'),

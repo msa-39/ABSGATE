@@ -21,16 +21,16 @@ def verify_token(token):
 
 @auth.error_handler
 def unauthorized():
-    return make_response(jsonify({'error': 'Unauthorized access'}), 403)
+    return make_response(jsonify({'ERROR': 'Unauthorized access'}), 403)
     # return 403 instead of 401 to prevent browsers from displaying the default auth dialog
 
 @app.errorhandler(400)
 def bad_request(error):
-    return make_response(jsonify({'error': 'Bad request'}), 400)
+    return make_response(jsonify({'ERROR': 'Bad request'}), 400)
 
 @app.errorhandler(404)
 def not_found(error):
-    return make_response(jsonify({'error': 'Not found'}), 404)
+    return make_response(jsonify({'ERROR': 'Not found'}), 404)
 
 @app.route('/absapi/v1/cus', methods=['GET'])
 @auth.login_required
