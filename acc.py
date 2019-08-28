@@ -42,14 +42,17 @@ def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/statement/<string:p_date_from>/<string:p_date_to>', methods=['GET'])
+
 # Get Statement of Account from date_from to date_to
 def GetAccStatement(p_idsmr, p_cacccur, p_iaccacc, p_date_from, p_date_to):
     res = None
     con = None
+
     try:
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+
     cu = con.cursor()
 
     res = cu.callfunc('isb_abs_api_acc.get_acc_statement_clob',
