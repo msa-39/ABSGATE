@@ -1,4 +1,5 @@
 # Микросервис API для работы со счетами
+#import cx_Oracle
 
 from flask import Flask, jsonify, make_response, request
 import json
@@ -25,7 +26,7 @@ def not_found(error):
     return make_response(jsonify({'ERROR': 'Not found'}), 404)
 
 
-@app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>', methods=['GET'])
+@app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/info', methods=['GET'])
 # Get information about Account
 def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
     res = None
@@ -40,6 +41,27 @@ def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+@app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/statement/<string:p_date_from>/<string:p_date_to>', methods=['GET'])
+# Get Statement of Account from date_from to date_to
+def GetAccStatement(p_idsmr, p_cacccur, p_iaccacc, p_date_from, p_date_to):
+    res = None
+    con = None
+    try:
+        con = absdb.set_connection()
+    except:
+        print('[ERROR] DB Connection ERROR!')
+    cu = con.cursor()
+
+    res = cu.callfunc('isb_abs_api_acc.get_acc_statement_clob',
+                      absdb.db.CLOB,
+                      [str(p_iaccacc), p_cacccur, str(p_idsmr), p_date_from, p_date_to])
+
+    return make_response(jsonify(json.loads(res.read())), 200)
+
+    #plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_acc.get_acc_statement(:p_caccacc, :p_cacccur, :p_idsmr, :p_date_from, :P_date_to)) from dual"
+    #cu.execute(plSQL, p_caccacc=str(p_iaccacc), p_cacccur=p_cacccur, p_idsmr=p_idsmr, p_date_from=p_date_from, p_date_to=p_date_to)
+    #res=cu.fetchall()
+    #return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 """
 
