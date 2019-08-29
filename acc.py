@@ -1,6 +1,6 @@
 # Микросервис API для работы со счетами
-#import cx_Oracle
 
+import datetime
 from flask import Flask, jsonify, make_response, request
 import json
 from dbutills import absdb
@@ -41,12 +41,25 @@ def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
-@app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/statement/<string:p_date_from>/<string:p_date_to>', methods=['GET'])
+
+@app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/statement/<int:p_date_from>/<int:p_date_to>', methods=['GET'])
 
 # Get Statement of Account from date_from to date_to
 def GetAccStatement(p_idsmr, p_cacccur, p_iaccacc, p_date_from, p_date_to):
     res = None
     con = None
+
+    caccacc = str(p_iaccacc)
+    cacccur = p_cacccur
+    cidsmr = str(p_idsmr)
+    begin_date = str(p_date_from)
+    end_date = str(p_date_to)
+
+    try:
+        date_time = datetime.datetime.strptime(begin_date, '%Y%m%d')
+        date_time = datetime.datetime.strptime(end_date, '%Y%m%d')
+    except:
+        return bad_request(400)
 
     try:
         con = absdb.set_connection()
@@ -57,7 +70,7 @@ def GetAccStatement(p_idsmr, p_cacccur, p_iaccacc, p_date_from, p_date_to):
 
     res = cu.callfunc('isb_abs_api_acc.get_acc_statement_clob',
                       absdb.db.CLOB,
-                      [str(p_iaccacc), p_cacccur, str(p_idsmr), p_date_from, p_date_to])
+                      [caccacc, cacccur, cidsmr, begin_date, end_date])
 
     return make_response(jsonify(json.loads(res.read())), 200)
 
