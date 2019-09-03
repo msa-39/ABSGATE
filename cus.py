@@ -33,8 +33,9 @@ def not_found(error):
     return make_response(jsonify({'ERROR': 'Not found'}), 404)
 
 @app.route('/absapi/v1/cus', methods=['GET'])
-@auth.login_required
 # Get short information about ALL Custimers, hwo has opened account
+
+@auth.login_required
 def GetCusAll():
     inn = request.args.get('inn')
     inn = (inn or '')
@@ -51,8 +52,9 @@ def GetCusAll():
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>', methods=['GET'])
-#@auth.login_required
 # Get short information about Custimer by icusnum
+
+#@auth.login_required
 def GetCusInfo(icusnum):
     res = None
     con = None
@@ -67,8 +69,9 @@ def GetCusInfo(icusnum):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>/fullinfo', methods=['GET'])
-#@auth.login_required
 # Get FULL information about Custimer by icusnum
+
+#@auth.login_required
 def GetCusFullInfo(icusnum):
     res = None
     con = None
@@ -86,8 +89,9 @@ def GetCusFullInfo(icusnum):
 
 
 @app.route('/absapi/v1/cus/<int:icusnum>/addresses', methods=['GET'])
-#@auth.login_required
 # Get Addresses of Customer by icusnum
+
+#@auth.login_required
 def GetCusAddressesInfo(icusnum):
     res = None
     con = None
@@ -102,8 +106,9 @@ def GetCusAddressesInfo(icusnum):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>/phones', methods=['GET'])
-#@auth.login_required
 # Get information about Custimer phones numbers by icusnum
+
+#@auth.login_required
 def GetCusPhonesInfo(icusnum):
     res = None
     con = None
@@ -118,8 +123,9 @@ def GetCusPhonesInfo(icusnum):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>/docums', methods=['GET'])
-#@auth.login_required
 # Get information about Custimer docums by icusnum
+
+#@auth.login_required
 def GetCusDocimsInfo(icusnum):
     res = None
     con = None
@@ -134,8 +140,9 @@ def GetCusDocimsInfo(icusnum):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>/links', methods=['GET'])
-#@auth.login_required
 # Get information about Custimer Links by icusnum
+
+#@auth.login_required
 def GetCusLinksInfo(icusnum):
     res = None
     con = None
@@ -150,8 +157,9 @@ def GetCusLinksInfo(icusnum):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/accounts', methods=['GET'])
-#@auth.login_required
 # Get information about Custimer Accounts by icusnum
+
+#@auth.login_required
 def GetCusAccountsInfo(icusnum):
     res = None
     con = None
@@ -166,8 +174,9 @@ def GetCusAccountsInfo(icusnum):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/credits', methods=['GET'])
-#@auth.login_required
 # Get information about Custimer Credits by icusnum
+
+#@auth.login_required
 def GetCusCreditsInfo(icusnum):
     res = None
     con = None
@@ -182,8 +191,9 @@ def GetCusCreditsInfo(icusnum):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/garants', methods=['GET'])
-#@auth.login_required
 # Get information about Custimer Garants by icusnum
+
+#@auth.login_required
 def GetCusGarantsInfo(icusnum):
     res = None
     con = None
@@ -198,8 +208,9 @@ def GetCusGarantsInfo(icusnum):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/depozits', methods=['GET'])
-#@auth.login_required
 # Get information about Custimer Deposits by icusnum
+
+#@auth.login_required
 def GetCusDepositsInfo(icusnum):
     res = None
     con = None
@@ -214,8 +225,9 @@ def GetCusDepositsInfo(icusnum):
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
 @app.route('/absapi/v1/cus/<int:icusnum>/rentdogs', methods=['GET'])
-#@auth.login_required
 # Get information about Custimer Rent Contracts
+
+#@auth.login_required
 def GetCusRentdogsInfo(icusnum):
     res = None
     con = None
@@ -228,6 +240,24 @@ def GetCusRentdogsInfo(icusnum):
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
+
+@app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/cards', methods=['GET'])
+# Get information about Custimer Cards
+
+#@auth.login_required
+def GetCusCardssInfo(icusnum):
+    res = None
+    con = None
+    try:
+        con = absdb.set_connection()
+    except:
+        print('[ERROR] DB Connection ERROR!')
+    cu = con.cursor()
+    plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_cards_info(:icusnum)) from dual"
+    cu.execute(plSQL, icusnum=icusnum)
+    res=cu.fetchall()
+    return make_response(jsonify(json.loads(res[0][0].read())), 200)
+
 
 ########################################################################################################################
 

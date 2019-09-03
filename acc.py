@@ -28,9 +28,21 @@ def not_found(error):
 
 @app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/info', methods=['GET'])
 # Get information about Account
+
 def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
+
+    caccacc = str(p_iaccacc)
+    cacccur = p_cacccur
+    cidsmr = str(p_idsmr)
     res = None
     con = None
+
+    try:
+        if ((len(caccacc) != 20) or (len(cacccur) != 3)):
+            raise Exception("Bad request")
+    except:
+        return bad_request(400)
+
     try:
         con = absdb.set_connection()
     except:
@@ -43,8 +55,8 @@ def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
 
 
 @app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/statement/<int:p_date_from>/<int:p_date_to>', methods=['GET'])
-
 # Get Statement of Account from date_from to date_to
+
 def GetAccStatement(p_idsmr, p_cacccur, p_iaccacc, p_date_from, p_date_to):
     res = None
     con = None
@@ -56,8 +68,10 @@ def GetAccStatement(p_idsmr, p_cacccur, p_iaccacc, p_date_from, p_date_to):
     end_date = str(p_date_to)
 
     try:
-        date_time = datetime.datetime.strptime(begin_date, '%Y%m%d')
-        date_time = datetime.datetime.strptime(end_date, '%Y%m%d')
+        date_time_begin = datetime.datetime.strptime(begin_date, '%Y%m%d')
+        date_time_end = datetime.datetime.strptime(end_date, '%Y%m%d')
+        if ((len(caccacc) != 20) or (len(cacccur) != 3) or (date_time_end < date_time_begin)):
+            raise Exception("Bad request")
     except:
         return bad_request(400)
 

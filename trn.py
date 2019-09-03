@@ -25,6 +25,25 @@ def not_found(error):
     return make_response(jsonify({'ERROR': 'Not found'}), 404)
 
 
+@app.route('/absapi/v1/trn/document/<string:itrnnum_itrnanum>', methods=['GET'])
+# Get document (transaction) information
+
+def GetTrnInfo(itrnnum_itrnanum):
+
+    l_itrnnum = 1
+    l_itrnanum = 0
+
+    try:
+        con = absdb.set_connection()
+    except:
+        print('[ERROR] DB Connection ERROR!')
+    cu = con.cursor()
+    plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_trn.get_trn_info(:p_itrnnum, :p_itrnanum)) from dual"
+    cu.execute(plSQL, p_itrnnum=l_itrnnum, p_itrnanum=l_itrnanum)
+    res=cu.fetchall()
+    return make_response(jsonify(json.loads(res[0][0].read())), 200)
+
+
 @app.route('/absapi/v1/trn', methods=['POST'])
 # Register PayMent
 def RegPayment():
