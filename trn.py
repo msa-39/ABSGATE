@@ -4,6 +4,7 @@ from flask import Flask, jsonify, make_response, request
 import json
 from dbutills import absdb
 from flask_httpauth import HTTPTokenAuth
+import re
 
 app = Flask(__name__)
 
@@ -28,10 +29,11 @@ def not_found(error):
 @app.route('/absapi/v1/trn/document/<string:itrnnum_itrnanum>', methods=['GET'])
 # Get document (transaction) information
 
+#@auth.login_required
 def GetTrnInfo(itrnnum_itrnanum):
 
-    l_itrnnum = 1
-    l_itrnanum = 0
+    l_itrnnum = int(re.match(r'\d+', itrnnum_itrnanum).group(0))
+    l_itrnanum = int(re.sub(r'\d+_', '', itrnnum_itrnanum))
 
     try:
         con = absdb.set_connection()
@@ -54,4 +56,4 @@ def RegPayment():
 
 if __name__ == '__main__':
     app.run(ssl_context=('/home/moiseev/cert.pem', '/home/moiseev/key.pem'),
-            debug=True, host='0.0.0.0', port=5003)
+            debug=True, host='0.0.0.0', port=5000)
