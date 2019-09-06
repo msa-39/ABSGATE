@@ -4,6 +4,7 @@ from flask import Flask, jsonify, make_response, request
 import json
 from dbutills import absdb
 from flask_httpauth import HTTPTokenAuth
+from utills import clients
 import re
 
 app = Flask(__name__)
@@ -11,6 +12,10 @@ app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
 auth = HTTPTokenAuth('Bearer')
+
+@auth.verify_token
+def verify_token(token):
+    return clients.check_key(token)
 
 @auth.error_handler
 def unauthorized():
