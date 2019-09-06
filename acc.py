@@ -145,5 +145,5 @@ def ChangeAccStatus(iacccur, iaccacc):
 """
 
 if __name__ == '__main__':
-    app.run(ssl_context=('/home/moiseev/cert.pem', '/home/moiseev/key.pem'),
+    app.run(ssl_context=('cert.pem', 'key.pem'),
             debug=True, host='0.0.0.0', port=5001)
