@@ -6,6 +6,9 @@ import json
 from dbutills import absdb
 from flask_httpauth import HTTPTokenAuth
 from utills import clients
+import logging
+
+#logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s', level=logging.INFO, filename=u'abs_api_acc.log')
 
 app = Flask(__name__)
 
@@ -30,10 +33,13 @@ def bad_request(error):
 def not_found(error):
     return make_response(jsonify({'ERROR': 'Not found'}), 404)
 
+@app.errorhandler(503)
+def not_available(error):
+    return make_response(jsonify({'ERROR': 'Service Unavailable'}), 503)
 
+########################################################################################################################
 @app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/info', methods=['GET'])
 # Get information about Account
-
 def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
 
     caccacc = str(p_iaccacc)
@@ -52,13 +58,15 @@ def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_acc.get_acc_info(:p_caccacc, :p_cacccur, :p_idsmr)) from dual"
     cu.execute(plSQL, p_caccacc=str(p_iaccacc), p_cacccur=p_cacccur, p_idsmr=p_idsmr)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
-
+########################################################################################################################
 @app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/statement/<int:p_date_from>/<int:p_date_to>', methods=['GET'])
 # Get Statement of Account from date_from to date_to
 
@@ -84,6 +92,7 @@ def GetAccStatement(p_idsmr, p_cacccur, p_iaccacc, p_date_from, p_date_to):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
 
     cu = con.cursor()
 
@@ -98,6 +107,7 @@ def GetAccStatement(p_idsmr, p_cacccur, p_iaccacc, p_date_from, p_date_to):
     #res=cu.fetchall()
     #return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 """
 
 @app.route('/absapi/v1/acc/<int:iacccur>/<int:iaccacc>/balance', methods=['GET'])
@@ -143,7 +153,8 @@ def ChangeAccStatus(iacccur, iaccacc):
     return make_response("[Ok] ChangeAccStatus\n Acc = "+str(iaccacc), 200)
 
 """
+########################################################################################################################
 
 if __name__ == '__main__':
-    app.run(ssl_context=('cert.pem', 'key.pem'),
+    app.run(ssl_context=('cert2019.pem', 'key2019.pem'),
             debug=True, host='0.0.0.0', port=5001)

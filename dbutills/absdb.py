@@ -22,9 +22,12 @@ def getdbsettings(ini_path):
     return (l_db_user, l_db_user_pwd, l_db_host, l_db_service_name)
 
 db_user, db_user_pwd, db_host, db_service_name = getdbsettings("absgate.ini")
+print(db_user, db_user_pwd, db_host, db_service_name)
+
 
 def set_connection():
-    return  db.connect("{}/{}@{}/{}".format(db_user, db_user_pwd, db_host, db_service_name))
+    #return  db.connect("{}/{}@{}/{}".format(db_user, db_user_pwd, db_host, db_service_name))
+    return db.connect(db_user, db_user_pwd, db_service_name)
 
 #cu = con.cursor()
 #cu.execute('SELECT idsmr, csmrname FROM smr_mf')

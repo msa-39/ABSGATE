@@ -12,6 +12,7 @@ import logging
 app = Flask(__name__)
 
 app.config['JSON_SORT_KEYS'] = False
+#app.config['JSON_SORT_KEYS'] = True
 
 auth = HTTPTokenAuth('Bearer')
 
@@ -32,6 +33,12 @@ def bad_request(error):
 def not_found(error):
     return make_response(jsonify({'ERROR': 'Not found'}), 404)
 
+@app.errorhandler(503)
+def not_available(error):
+    return make_response(jsonify({'ERROR': 'Service Unavailable'}), 503)
+
+########################################################################################################################
+
 @app.route('/absapi/v1/cus', methods=['GET'])
 # Get short information about ALL Custimers, hwo has opened account
 
@@ -44,6 +51,8 @@ def GetCusAll():
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_all_cus_info(:inn)) from dual"
     cu.execute(plSQL, inn=inn)
@@ -51,6 +60,7 @@ def GetCusAll():
     #if res
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>', methods=['GET'])
 # Get short information about Custimer by icusnum
 
@@ -62,12 +72,15 @@ def GetCusInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/fullinfo', methods=['GET'])
 # Get FULL information about Custimer by icusnum
 
@@ -79,15 +92,15 @@ def GetCusFullInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_full_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
-#    return make_response(jsonify({'msg': '[Ok] GetCusFullInfo CusNum = '+str(icusnum)}), 200)
-
-
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/addresses', methods=['GET'])
 # Get Addresses of Customer by icusnum
 
@@ -99,12 +112,15 @@ def GetCusAddressesInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_addresses_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/phones', methods=['GET'])
 # Get information about Custimer phones numbers by icusnum
 
@@ -116,12 +132,15 @@ def GetCusPhonesInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_phones_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/docums', methods=['GET'])
 # Get information about Custimer docums by icusnum
 
@@ -133,12 +152,15 @@ def GetCusDocimsInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_docs_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/links', methods=['GET'])
 # Get information about Custimer Links by icusnum
 
@@ -150,12 +172,15 @@ def GetCusLinksInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_links_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/accounts', methods=['GET'])
 # Get information about Custimer Accounts by icusnum
 
@@ -167,12 +192,15 @@ def GetCusAccountsInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_accounts_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/credits', methods=['GET'])
 # Get information about Custimer Credits by icusnum
 
@@ -184,12 +212,15 @@ def GetCusCreditsInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_credits_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/garants', methods=['GET'])
 # Get information about Custimer Garants by icusnum
 
@@ -201,12 +232,15 @@ def GetCusGarantsInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_garants_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/depozits', methods=['GET'])
 # Get information about Custimer Deposits by icusnum
 
@@ -218,12 +252,15 @@ def GetCusDepositsInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_depozits_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/rentdogs', methods=['GET'])
 # Get information about Custimer Rent Contracts
 
@@ -235,12 +272,15 @@ def GetCusRentdogsInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_rentdogs_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
     res=cu.fetchall()
     return make_response(jsonify(json.loads(res[0][0].read())), 200)
 
+########################################################################################################################
 @app.route('/absapi/v1/cus/<int:icusnum>/bankproducts/cards', methods=['GET'])
 # Get information about Custimer Cards
 
@@ -252,6 +292,8 @@ def GetCusCardssInfo(icusnum):
         con = absdb.set_connection()
     except:
         print('[ERROR] DB Connection ERROR!')
+        return not_available(503)
+
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_cus.get_cus_cards_info(:icusnum)) from dual"
     cu.execute(plSQL, icusnum=icusnum)
@@ -276,5 +318,5 @@ def GetCusCardssInfo(icusnum):
 ########################################################################################################################
 
 if __name__ == '__main__':
-    app.run(ssl_context=('cert.pem', 'key.pem'),
+    app.run(ssl_context=('cert2019.pem', 'key2019.pem'),
             debug=True, host='0.0.0.0', port=5002)
