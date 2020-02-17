@@ -20,8 +20,9 @@ def register_rur_doc(j_doc):
 
 #        print(json.dumps(data, sort_keys=True, indent=4, ensure_ascii=False))
 #        print(json.dumps(data))
+#        print(json2html.convert(json=data))
+
         print(data)
- #       print(json2html.convert(json=data))
 
     except Exception as e:
         print("Exception (getfromapi):", e)
