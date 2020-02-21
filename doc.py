@@ -41,6 +41,7 @@ def not_available(error):
 @app.route('/absapi/v1/doc/<string:p_docid>', methods=['GET'])
 # Get document (transaction) information
 
+# Требуется авторизация
 #@auth.login_required
 def GetTrnInfo(p_docid):
 
@@ -76,6 +77,7 @@ def GetTrnInfo(p_docid):
 @app.route('/absapi/v1/doc', methods=['POST'])
 # Register RUR PayMent
 
+# Требуется авторизация
 @auth.login_required
 
 def RegRURPayment():
@@ -102,9 +104,9 @@ def RegRURPayment():
         CREC_BIC        =   in_json['CREC_BIC']               # БИК банка ПОЛУЧАТЕЛЯ
         CREC_CORACC     =   in_json['CREC_CORACC']            # Корреспонденский счет банка ПОЛУЧАТЕЛЯ
         CREC_ACC        =   in_json['CREC_ACC']               # Счет ПОЛУЧАТЕЛЯ
-        CREC_NAME       =   in_json['CREC_NAME']              # ИНН ПОЛУЧАТЕЛЯ
-        CREC_INN        =   in_json['CREC_INN']               # КПП ПОЛУЧАТЕЛЯ
-        CREC_KPP        =   in_json['CREC_KPP']               # Наименование ПОЛУЧАТЕЛЯ
+        CREC_NAME       =   in_json['CREC_NAME']              # Наименование ПОЛУЧАТЕЛЯ
+        CREC_INN        =   in_json['CREC_INN']               # ИНН ПОЛУЧАТЕЛЯ
+        CREC_KPP        =   in_json['CREC_KPP']               # КПП ПОЛУЧАТЕЛЯ
 
         CTRNPURP        =   in_json['CTRNPURP']               # Назначение платежа
 # Налоговая информация
@@ -135,10 +137,10 @@ def RegRURPayment():
         print('[ERROR] DB Connection ERROR!')
         return not_available(503)
 
-    ResCode     =   cur.var(int)                  #  Код результата выполнения процедуры(0 - OK, -1 - ERROR)
+    RESCODE     =   cur.var(int)                  #  Код результата выполнения процедуры (-1 - ERROR; 1 - Документ зарегистрирован; 2 - Документ в Отложенные; 3 - Документ на Картотеку)
     #ResCode.setvalue(0,-1)
 
-    RetMsg      =   cur.var(absdb.db.STRING)      #  Строка с сообщением о результате
+    RETMSG      =   cur.var(absdb.db.STRING)      #  Строка с сообщением о результате
     #RetMsg.setvalue(0, '')
 
     DOCID       =   cur.var(absdb.db.STRING)      #  Идентификатор документа в формате "doctype_inum_ianum"
@@ -183,16 +185,19 @@ def RegRURPayment():
         CIP,
         CMAC,
 # Выходные параметры
-        ResCode,
-        RetMsg,
+        RESCODE,
+        RETMSG,
         DOCID
     ])
 
-    j_rez = {'ResCode': ResCode.getvalue(),
-             'RetMsg': RetMsg.getvalue(),
+    j_rez = {'RESCODE': RESCODE.getvalue(),
+             'RETMSG': RETMSG.getvalue(),
              'DOCID': DOCID.getvalue()}
 
-    return make_response(jsonify(j_rez), 200)
+    if RESCODE.getvalue()>0:
+        return make_response(jsonify(j_rez), 201)
+    else:
+        return make_response(jsonify(j_rez), 200)
 
 if __name__ == '__main__':
     app.run(ssl_context=('cert2019.pem', 'key2019.pem'),
