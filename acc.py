@@ -8,7 +8,7 @@ from flask_httpauth import HTTPTokenAuth
 from utills import clients
 import logging
 
-#logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s', level=logging.INFO, filename=u'abs_api_acc.log')
+logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s', level=logging.INFO, filename=u'abs_api_acc.log')
 
 app = Flask(__name__)
 
@@ -33,6 +33,10 @@ def bad_request(error):
 def not_found(error):
     return make_response(jsonify({'ERROR': 'Not found'}), 404)
 
+@app.errorhandler(500)
+def internal_error(error):
+    return make_response(jsonify({'ERROR': 'Internal error'}), 500)
+
 @app.errorhandler(503)
 def not_available(error):
     return make_response(jsonify({'ERROR': 'Service Unavailable'}), 503)
@@ -40,6 +44,7 @@ def not_available(error):
 ########################################################################################################################
 @app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/info', methods=['GET'])
 # Get information about Account
+
 def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
 
     caccacc = str(p_iaccacc)
@@ -62,9 +67,12 @@ def GetAccInfo(p_idsmr, p_cacccur, p_iaccacc):
 
     cu = con.cursor()
     plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_acc.get_acc_info(:p_caccacc, :p_cacccur, :p_idsmr)) from dual"
-    cu.execute(plSQL, p_caccacc=str(p_iaccacc), p_cacccur=p_cacccur, p_idsmr=p_idsmr)
-    res=cu.fetchall()
-    return make_response(jsonify(json.loads(res[0][0].read())), 200)
+    try:
+        cu.execute(plSQL, p_caccacc=str(p_iaccacc), p_cacccur=p_cacccur, p_idsmr=p_idsmr)
+        res=cu.fetchall()
+        return make_response(jsonify(json.loads(res[0][0].read())), 200)
+    except:
+        return internal_error(500)
 
 ########################################################################################################################
 @app.route('/absapi/v1/acc/<int:p_idsmr>/<string:p_cacccur>/<int:p_iaccacc>/statement/<int:p_date_from>/<int:p_date_to>', methods=['GET'])
@@ -96,11 +104,13 @@ def GetAccStatement(p_idsmr, p_cacccur, p_iaccacc, p_date_from, p_date_to):
 
     cu = con.cursor()
 
-    res = cu.callfunc('isb_abs_api_acc.get_acc_statement_clob',
-                      absdb.db.CLOB,
-                      [caccacc, cacccur, cidsmr, begin_date, end_date])
-
-    return make_response(jsonify(json.loads(res.read())), 200)
+    try:
+        res = cu.callfunc('isb_abs_api_acc.get_acc_statement_clob',
+                          absdb.db.CLOB,
+                          [caccacc, cacccur, cidsmr, begin_date, end_date])
+        return make_response(jsonify(json.loads(res.read())), 200)
+    except:
+        return internal_error(500)
 
     #plSQL = "select isb_abs_api_util.pljson_value2clob(isb_abs_api_acc.get_acc_statement(:p_caccacc, :p_cacccur, :p_idsmr, :p_date_from, :P_date_to)) from dual"
     #cu.execute(plSQL, p_caccacc=str(p_iaccacc), p_cacccur=p_cacccur, p_idsmr=p_idsmr, p_date_from=p_date_from, p_date_to=p_date_to)

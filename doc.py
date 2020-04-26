@@ -8,7 +8,7 @@ from utills import clients
 import re
 import logging
 
-#logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s', level=logging.INFO, filename=u'abs_api_trn.log')
+logging.basicConfig(format=u'%(levelname)-8s [%(asctime)s] %(message)s', level=logging.INFO, filename=u'abs_api_doc.log')
 
 app = Flask(__name__)
 
@@ -32,6 +32,10 @@ def bad_request(error):
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'ERROR': 'Not found'}), 404)
+
+@app.errorhandler(500)
+def internal_error(error):
+    return make_response(jsonify({'ERROR': 'Internal error'}), 500)
 
 @app.errorhandler(503)
 def not_available(error):
@@ -69,9 +73,12 @@ def GetTrnInfo(p_docid):
     if (len(plSQL) == 0):
         return bad_request(400)
 
-    cur.execute(plSQL, p_itrnnum=l_inum, p_itrnanum=l_ianum)
-    res=cur.fetchall()
-    return make_response(jsonify(json.loads(res[0][0].read())), 200)
+    try:
+        cur.execute(plSQL, p_itrnnum=l_inum, p_itrnanum=l_ianum)
+        res=cur.fetchall()
+        return make_response(jsonify(json.loads(res[0][0].read())), 200)
+    except:
+        return internal_error(500)
 
 ########################################################################################################################
 @app.route('/absapi/v1/doc', methods=['POST'])
@@ -146,58 +153,61 @@ def RegRURPayment():
     DOCID       =   cur.var(absdb.db.STRING)      #  Идентификатор документа в формате "doctype_inum_ianum"
     #DOCID.setvalue(0, '')
 
-    #plSQL = ""
-
-    cur.callproc('isb_abs_api_docs.REG_RUR_DOC', [
-        IDSMR,
-        DOC_SUMMA,
-        PRIORYTY,
-        DOC_NUM,
-        DOC_DATE,
-        VID_PLAT_CODE,
+    try:
+        cur.callproc('isb_abs_api_docs.REG_RUR_DOC', [
+            IDSMR,
+            DOC_SUMMA,
+            PRIORYTY,
+            DOC_NUM,
+            DOC_DATE,
+            VID_PLAT_CODE,
 # Плательщик
-        CPAY_ACC,
-        CPAY_NAME,
-        CPAY_INN,
-        CPAY_KPP,
+            CPAY_ACC,
+            CPAY_NAME,
+            CPAY_INN,
+            CPAY_KPP,
 # Получатель
-        CREC_BANK_NAME,
-        CREC_BIC,
-        CREC_CORACC,
-        CREC_ACC,
-        CREC_NAME,
-        CREC_INN,
-        CREC_KPP,
-        CTRNPURP,
+            CREC_BANK_NAME,
+            CREC_BIC,
+            CREC_CORACC,
+            CREC_ACC,
+            CREC_NAME,
+            CREC_INN,
+            CREC_KPP,
+            CTRNPURP,
 # Налоговая информация
-        NAL_STATUS_P101,
-        NAL_KBK_P104,
-        NAL_OKATO_P105,
-        NAL_OSNOVANIE_P106,
-        NAL_PERIOD_P107,
-        NAL_DOCNUM_P108,
-        NAL_DOCDATE_P109,
-        NAL_DOCTYPE_P110,
-        UIN_P22,
-        CSIGN1_FIO,
-        CSIGN2_FIO,
-        CID,
-        CIP,
-        CMAC,
+            NAL_STATUS_P101,
+            NAL_KBK_P104,
+            NAL_OKATO_P105,
+            NAL_OSNOVANIE_P106,
+            NAL_PERIOD_P107,
+            NAL_DOCNUM_P108,
+            NAL_DOCDATE_P109,
+            NAL_DOCTYPE_P110,
+            UIN_P22,
+            CSIGN1_FIO,
+            CSIGN2_FIO,
+            CID,
+            CIP,
+            CMAC,
 # Выходные параметры
-        RESCODE,
-        RETMSG,
-        DOCID
-    ])
+            RESCODE,
+            RETMSG,
+            DOCID
+        ])
 
-    j_rez = {'RESCODE': RESCODE.getvalue(),
-             'RETMSG': RETMSG.getvalue(),
-             'DOCID': DOCID.getvalue()}
+        j_rez = {'RESCODE': RESCODE.getvalue(),
+                 'RETMSG': RETMSG.getvalue(),
+                 'DOCID': DOCID.getvalue()}
+    except:
+        return internal_error(500)
 
     if RESCODE.getvalue()>0:
         return make_response(jsonify(j_rez), 201)
     else:
         return make_response(jsonify(j_rez), 200)
+
+########################################################################################################################
 
 if __name__ == '__main__':
     app.run(ssl_context=('cert2019.pem', 'key2019.pem'),
